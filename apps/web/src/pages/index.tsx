@@ -22,6 +22,10 @@ const SidebarMenuItems: TwitterSidebarButton[] = [
   {
     title: "Notifications",
     icon: <BsBell />,
+
+
+
+    
   },
   {
     title: "Messages",
