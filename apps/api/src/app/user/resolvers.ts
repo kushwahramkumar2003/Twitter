@@ -1,7 +1,67 @@
+import axios from "axios";
+import { prismaClient } from "../../clients";
+import JWTService from "../../services/jwt";
+import { User } from "@apollo/server/src/plugin/schemaReporting/generated/operations";
+
+interface GoogleTokenResult {
+  iss?: string;
+  nbf?: string;
+  aud?: string;
+  sub?: string;
+  email: string;
+  email_verified: string;
+  azp?: string;
+  name?: string;
+  picture?: string;
+  given_name: string;
+  family_name?: string;
+  iat?: string;
+  exp?: string;
+  jti?: string;
+  alg?: string;
+  kid?: string;
+  typ?: string;
+}
+
 const resolvers = {
   queries: {
     verifyGoogleToken: async (parent: any, { token }: { token: string }) => {
-      return token;
+      const googleToken = token;
+      console.log("Here");
+      const googleOauthURL = new URL("https://oauth2.googleapis.com/tokeninfo");
+      googleOauthURL.searchParams.set("id_token", googleToken);
+
+      const { data } = await axios.get<GoogleTokenResult>(
+        googleOauthURL.toString(),
+        {
+          responseType: "json",
+        }
+      );
+
+      const user = await prismaClient.user.findUnique({
+        where: { email: data.email },
+      });
+
+      if (!user) {
+        await prismaClient.user.create({
+          data: {
+            email: data.email,
+            firstName: data.given_name,
+            lastName: data.family_name,
+            profileImageUrl: data.picture,
+          },
+        });
+      }
+      const userInDB = await prismaClient.user.findUnique({
+        where: { email: data.email },
+      });
+
+      if (!userInDB) {
+        throw new Error("User with email not found");
+      }
+      // @ts-ignore
+      const userToken = JWTService.generateTokenForUser(userInDB);
+      return userToken;
     },
   },
 };
