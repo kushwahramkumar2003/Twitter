@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { Inter, Quicksand } from "next/font/google";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import  { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 const quicksand = Quicksand({ subsets: ["latin"] });
@@ -10,6 +11,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <div className={quicksand.className}>
       <GoogleOAuthProvider clientId="859866069949-gfjk74musi75pliovtt2ofcji1td5min.apps.googleusercontent.com">
         <Component {...pageProps} />
+        <Toaster />
       </GoogleOAuthProvider>
     </div>
   );

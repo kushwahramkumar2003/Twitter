@@ -3,23 +3,31 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "concurrently \"npm run codegen\"  next dev --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --check .",
-    "format:fix": "prettier --write --list-different ."
+    "format:fix": "prettier --write --list-different .",
+    "codegen": "graphql-codegen --config codegen.ts --watch"
   },
   "dependencies": {
+    "@parcel/watcher": "^2.4.0",
     "@react-oauth/google": "^0.12.1",
     "@repo/ui": "*",
+    "graphql": "^16.8.1",
+    "graphql-request": "^6.1.0",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-hot-toast": "^2.4.1",
     "react-icons": "^5.0.1"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.2",
+    "@graphql-codegen/client-preset": "4.2.2",
+    "@graphql-codegen/introspection": "4.0.2",
     "@next/eslint-plugin-next": "^14.0.4",
     "@repo/tailwind-config": "*",
     "@repo/typescript-config": "*",
@@ -27,6 +35,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
+    "concurrently": "^8.2.2",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
     "postcss": "^8",
