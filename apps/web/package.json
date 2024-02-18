@@ -12,6 +12,7 @@
     "format:fix": "prettier --write --list-different ."
   },
   "dependencies": {
+    "@react-oauth/google": "^0.12.1",
     "@repo/ui": "*",
     "next": "14.1.0",
     "react": "^18",

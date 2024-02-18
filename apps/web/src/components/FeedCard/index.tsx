@@ -30,7 +30,7 @@ const FeedCard: React.FC = () => {
           </p>
           <div
             className={
-              "flex justify-between mt-5 text-xl items-center p-2 w-[90%]"
+              "flex justify-between mt-5 text-xl items-center p-2 w-[90%] "
             }
           >
             <div>
