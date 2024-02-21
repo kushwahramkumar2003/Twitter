@@ -5,6 +5,7 @@ import { expressMiddleware } from "@apollo/server/express4";
 import cors from "cors";
 import { prismaClient } from "../clients";
 import { User } from "./user";
+import { GraphqlContext } from "../interfaces";
 
 export async function initServer() {
   const app = express();
@@ -17,7 +18,7 @@ export async function initServer() {
     })
   );
 
-  const graphqlServer = new ApolloServer({
+  const graphqlServer = new ApolloServer<GraphqlContext>({
     typeDefs: `
     ${User.types}
     type Query{
@@ -33,7 +34,13 @@ export async function initServer() {
 
   await graphqlServer.start();
 
-  app.use("/graphql", expressMiddleware(graphqlServer));
+  app.use("/graphql", expressMiddleware(graphqlServer, { context: 
+    async({req,res})=>{
+      return {
+        user:
+      }
+    }
+   }));
 
   return app;
 }
