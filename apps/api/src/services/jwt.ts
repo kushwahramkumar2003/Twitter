@@ -1,20 +1,25 @@
 import JWT from "jsonwebtoken";
-import dotenv from "dotenv";
-import { prismaClient } from "../clients";
-import { User } from "@apollo/server/src/plugin/schemaReporting/generated/operations";
+import { User } from "@prisma/client";
+import { JWTUser } from "../interfaces";
 
-dotenv.config();
-
-const JWT_SECRET = process.env.JWT_SECRET ?? "";
+const JWT_SECRET = "$uper@1234.";
 
 class JWTService {
   public static generateTokenForUser(user: User) {
-    const payload = {
+    const payload: JWTUser = {
       id: user?.id,
       email: user?.email,
     };
     const token = JWT.sign(payload, JWT_SECRET);
     return token;
+  }
+
+  public static decodeToken(token: string) {
+    try {
+      return JWT.verify(token, JWT_SECRET) as JWTUser;
+    } catch (error) {
+      return null;
+    }
   }
 }
 

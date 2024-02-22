@@ -7,6 +7,9 @@ import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { graphClient } from "../../clients/api";
 import { verifyUserGoogleTokenQuery } from "../../graphql/query/user";
+import { useCurrentUser } from "@/hooks/user";
+import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
 
 interface TwitterSidebarButton {
   title: string;
@@ -49,6 +52,9 @@ const SidebarMenuItems: TwitterSidebarButton[] = [
 ];
 
 export default function Home() {
+  const { user } = useCurrentUser();
+  const queryClient = useQueryClient();
+
   const handleLoginWithGoogle = useCallback(
     async (cred: CredentialResponse) => {
       const googleToken = cred.credential;
@@ -56,12 +62,15 @@ export default function Home() {
       if (!googleToken) {
         return toast.error("Google token not found");
       }
-      const { verifyGoogleToken } = await graphClient.request(
-        verifyUserGoogleTokenQuery,
-        {
-          token: googleToken,
-        }
-      );
+      // const { verifyGoogleToken } = await graphClient.request(
+      const response = await graphClient.request(verifyUserGoogleTokenQuery, {
+        token: googleToken,
+      });
+
+      console.log("response --> ", response);
+
+      console.log("verifyGoogleToken --> ", response.verifyGoogleToken);
+      const { verifyGoogleToken } = response;
 
       if (!verifyGoogleToken) {
         return toast.error("User not found");
@@ -73,13 +82,15 @@ export default function Home() {
       if (verifyGoogleToken) {
         localStorage.setItem("__twitter_token", verifyGoogleToken);
       }
+
+      await queryClient.invalidateQueries({ queryKey: ["current-user"] });
     },
-    []
+    [queryClient]
   );
   return (
     <div>
       <div className="grid grid-cols-12 h-screen w-screen px-56">
-        <div className="col-span-3 pt-1 ml-22">
+        <div className="col-span-3 pt-1 ml-22 relative">
           <div
             className="text-2xl
           hover:bg-gray-800 rounded-full
@@ -111,6 +122,23 @@ export default function Home() {
               </button>
             </div>
           </div>
+          <div className="mt-5 absolute bottom-5 flex items-center gap-2 bg-slate-800 px-3 py-2 rounded-full p-4">
+            {user && user?.profileImageURL && (
+              <Image
+                src={user?.profileImageURL}
+                alt="profile"
+                width={50}
+                height={50}
+                className="rounded-full "
+              />
+            )}
+            {user && (
+              <div className="item-center">
+                <h3 className="text-xl">{user?.firstName}</h3>
+                <h3 className="text-xl">{user?.lastName}</h3>
+              </div>
+            )}
+          </div>
         </div>
         <div className="col-span-5 border-r-[1px] border-l-[1px] border-gray-600  h-screen overflow-scroll">
           <FeedCard />
@@ -121,10 +149,12 @@ export default function Home() {
           <FeedCard />
         </div>
         <div className="col-span-3 p-5">
-          <div className="bg-slate-700 rounded-lg ">
-            <h1 className={"my-2 text-2xl"}>New to Twitter?</h1>
-            <GoogleLogin onSuccess={handleLoginWithGoogle} />
-          </div>
+          {!user && (
+            <div className="bg-slate-700 rounded-lg ">
+              <h1 className={"my-2 text-2xl"}>New to Twitter?</h1>
+              <GoogleLogin onSuccess={handleLoginWithGoogle} />
+            </div>
+          )}
         </div>
       </div>
     </div>
