@@ -1,8 +1,8 @@
 export interface JWTUser {
   id: string;
-  email: string;
+  email?: string | null;
 }
 
 export interface GraphqlContext {
-  user: JWTUser;
+  user?: JWTUser;
 }

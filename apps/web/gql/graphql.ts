@@ -16,9 +16,51 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export type CreateTweetData = {
+  content: Scalars['String']['input'];
+  imageURL?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  createTweet?: Maybe<Tweet>;
+  followUser?: Maybe<Scalars['Boolean']['output']>;
+  unfollowUser?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type MutationCreateTweetArgs = {
+  payload: CreateTweetData;
+};
+
+
+export type MutationFollowUserArgs = {
+  to: Scalars['ID']['input'];
+};
+
+
+export type MutationUnfollowUserArgs = {
+  to: Scalars['ID']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
+  getAllTweets?: Maybe<Array<Maybe<Tweet>>>;
+  getCurrentUser?: Maybe<User>;
+  getSignedURLForTweet?: Maybe<Scalars['String']['output']>;
+  getUserById?: Maybe<User>;
   verifyGoogleToken?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type QueryGetSignedUrlForTweetArgs = {
+  imageName: Scalars['String']['input'];
+  imageType: Scalars['String']['input'];
+};
+
+
+export type QueryGetUserByIdArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -26,13 +68,25 @@ export type QueryVerifyGoogleTokenArgs = {
   token: Scalars['String']['input'];
 };
 
+export type Tweet = {
+  __typename?: 'Tweet';
+  author?: Maybe<User>;
+  content: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  imageURL?: Maybe<Scalars['String']['output']>;
+};
+
 export type User = {
   __typename?: 'User';
-  email?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
   firstName: Scalars['String']['output'];
+  followers?: Maybe<Array<Maybe<User>>>;
+  following?: Maybe<Array<Maybe<User>>>;
   id: Scalars['ID']['output'];
-  lastName: Scalars['String']['output'];
+  lastName?: Maybe<Scalars['String']['output']>;
   profileImageURL?: Maybe<Scalars['String']['output']>;
+  recommendedUsers?: Maybe<Array<Maybe<User>>>;
+  tweets?: Maybe<Array<Maybe<Tweet>>>;
 };
 
 export type VerifyUserGoogleTokenQueryVariables = Exact<{
@@ -42,5 +96,11 @@ export type VerifyUserGoogleTokenQueryVariables = Exact<{
 
 export type VerifyUserGoogleTokenQuery = { __typename?: 'Query', verifyGoogleToken?: string | null };
 
+export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'User', id: string, profileImageURL?: string | null, email: string, firstName: string, lastName?: string | null } | null };
+
 
 export const VerifyUserGoogleTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"VerifyUserGoogleToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"token"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"verifyGoogleToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"token"},"value":{"kind":"Variable","name":{"kind":"Name","value":"token"}}}]}]}}]} as unknown as DocumentNode<VerifyUserGoogleTokenQuery, VerifyUserGoogleTokenQueryVariables>;
+export const GetCurrentUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCurrentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCurrentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"profileImageURL"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}}]}}]}}]} as unknown as DocumentNode<GetCurrentUserQuery, GetCurrentUserQueryVariables>;
